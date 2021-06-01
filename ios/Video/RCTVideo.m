@@ -383,6 +383,7 @@ static int const RCTVideoUnset = -1;
       }
       
       self->_player = [AVPlayer playerWithPlayerItem:self->_playerItem];
+      self->_player.allowsExternalPlayback = NO;
       self->_player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
       
       [self->_player addObserver:self forKeyPath:playbackRate options:0 context:nil];
@@ -947,11 +948,25 @@ static int const RCTVideoUnset = -1;
     }
 
     if (category != nil && options != nil) {
-      [session setCategory:category withOptions:options error:nil];
+        if (@available(iOS 11.0, *)) {
+            [session setCategory:category mode:AVAudioSessionModeDefault routeSharingPolicy: AVAudioSessionRouteSharingPolicyDefault options:options error:nil];
+        } else {
+            // Fallback on earlier versions
+            [session setCategory:category withOptions:options error:nil];
+        }
     } else if (category != nil && options == nil) {
-      [session setCategory:category error:nil];
+        if (@available(iOS 11.0, *)) {
+            [session setCategory:category mode:AVAudioSessionModeDefault routeSharingPolicy: AVAudioSessionRouteSharingPolicyDefault options:session.categoryOptions error:nil];
+        } else {
+            // Fallback on earlier versions
+            [session setCategory:category error:nil];
+        }
     } else if (category == nil && options != nil) {
-      [session setCategory:session.category withOptions:options error:nil];
+        if (@available(iOS 11.0, *)) {
+            [session setCategory:session.category mode:AVAudioSessionModeDefault routeSharingPolicy: AVAudioSessionRouteSharingPolicyDefault options:options error:nil];
+        } else {
+            [session setCategory:session.category withOptions:options error:nil];
+        }
     }
 
     if (@available(iOS 10.0, *) && !_automaticallyWaitsToMinimizeStalling) {
