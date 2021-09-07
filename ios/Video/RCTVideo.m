@@ -102,7 +102,8 @@ static int const RCTVideoUnset = -1;
     _isExternalPlaybackActiveObserverRegistered = NO;
     _playbackStalled = NO;
     _rate = 1.0;
-    _volume = 1.0;
+    _volume = 0.0;
+    _muted = YES;
     _resizeMode = @"AVLayerVideoGravityResizeAspectFill";
     _fullscreenAutorotate = YES;
     _fullscreenOrientation = @"all";
@@ -384,6 +385,8 @@ static int const RCTVideoUnset = -1;
       
       self->_player = [AVPlayer playerWithPlayerItem:self->_playerItem];
       self->_player.allowsExternalPlayback = NO;
+      [self->_player setMuted:YES];
+      [self->_player setVolume:0.0];
       self->_player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
       
       [self->_player addObserver:self forKeyPath:playbackRate options:0 context:nil];
